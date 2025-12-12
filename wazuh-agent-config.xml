@@ -1,0 +1,25 @@
+<!-- =============================================================
+     CONFIGURATION WAZUH AGENT - LOGS MODSECURITY
+     =============================================================
+     Ajoutez cette configuration dans le fichier ossec.conf de l'agent Wazuh
+     Chemin Windows : C:\Program Files (x86)\ossec-agent\ossec.conf
+     Chemin Linux   : /var/ossec/etc/ossec.conf
+     ============================================================= -->
+
+<!-- Localfile pour les logs ModSecurity (format JSON) -->
+<localfile>
+  <log_format>json</log_format>
+  <location>C:\Users\Utilisateur\Desktop\Formation\Docker\WAF\logs\modsec_audit.log</location>
+  <label key="source">modsecurity</label>
+  <label key="waf">owasp-crs</label>
+</localfile>
+
+<!-- OU si vous utilisez un chemin relatif (Linux) -->
+<!--
+<localfile>
+  <log_format>json</log_format>
+  <location>/path/to/WAF/logs/modsec_audit.log</location>
+  <label key="source">modsecurity</label>
+  <label key="waf">owasp-crs</label>
+</localfile>
+-->

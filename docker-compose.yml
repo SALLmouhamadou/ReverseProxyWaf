@@ -22,6 +22,14 @@ services:
     volumes:
       - ./server.crt:/etc/nginx/certs/server.crt:ro
       - ./server.key:/etc/nginx/certs/server.key:ro
+      #######################################################
+      # Règles WAF personnalisées (blocage utilisateurs)
+      #######################################################
+      - ./REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
+      #######################################################
+      # Logs d'audit ModSecurity (pour Wazuh)
+      #######################################################
+      - ./logs:/var/log/modsecurity:rw
     
     environment:
       # Configuration du proxy
@@ -38,10 +46,14 @@ services:
       # ============================================
       # MODSEC_RULE_ENGINE - ACTIVATION PROGRESSIVE
       # ============================================
-      MODSEC_RULE_ENGINE: "DetectionOnly"
+      MODSEC_RULE_ENGINE: "On"
       
-      # Journalisation des événements
+      # ============================================
+      # Configuration des logs d'audit pour Wazuh
+      # ============================================
       MODSEC_AUDIT_ENGINE: "RelevantOnly"
+      MODSEC_AUDIT_LOG: "/var/log/modsecurity/modsec_audit.log"
+      MODSEC_AUDIT_LOG_FORMAT: "JSON"
       
       # Niveau de paranoïa
       PARANOIA: 1
@@ -52,3 +64,5 @@ services:
       ANOMALY_OUTBOUND: 999
       
       REPORTING_LEVEL: 2
+
+
