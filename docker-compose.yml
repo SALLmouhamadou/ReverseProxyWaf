@@ -1,0 +1,54 @@
+# WAF ModSecurity CRS devant Juice Shop
+# =====================================
+# Juice Shop : http://localhost:3000 (déjà en cours)
+# WAF HTTP   : http://localhost:8000
+# WAF HTTPS  : https://localhost:8443
+#
+# PHASE ACTUELLE : Phase 2 - Mode Observation (DetectionOnly)
+
+services:
+  waf:
+    image: owasp/modsecurity-crs:nginx
+    container_name: waf-modsecurity
+    ports:
+      - "8000:8080"    # HTTP
+      - "8443:8443"    # HTTPS
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    
+    #######################################################
+    # Add TLS server certificate and key
+    #######################################################
+    volumes:
+      - ./server.crt:/etc/nginx/certs/server.crt:ro
+      - ./server.key:/etc/nginx/certs/server.key:ro
+    
+    environment:
+      # Configuration du proxy
+      SERVERNAME: localhost
+      BACKEND: "http://host.docker.internal:3000"
+      
+      # Configuration SSL/TLS
+      SSL_ENGINE: "on"
+      SSL_PORT: 8443
+      SSL_CERT: "/etc/nginx/certs/server.crt"
+      SSL_CERT_KEY: "/etc/nginx/certs/server.key"
+      PROXY_SSL: "off"
+      
+      # ============================================
+      # MODSEC_RULE_ENGINE - ACTIVATION PROGRESSIVE
+      # ============================================
+      MODSEC_RULE_ENGINE: "DetectionOnly"
+      
+      # Journalisation des événements
+      MODSEC_AUDIT_ENGINE: "RelevantOnly"
+      
+      # Niveau de paranoïa
+      PARANOIA: 1
+      BLOCKING_PARANOIA: 1
+      
+      # Seuils d'anomalie
+      ANOMALY_INBOUND: 5
+      ANOMALY_OUTBOUND: 999
+      
+      REPORTING_LEVEL: 2
